@@ -6,8 +6,8 @@ class ListItem extends React.Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick(e) {
-    this.props.listClickHandler(this.props.place);
+  handleClick(event) {
+    this.props.handlePlaceSelect(this.props.place);
   }
 
   render() {
@@ -37,7 +37,7 @@ class PlacesList extends React.Component {
                 <ListItem
                   key={index.toString()}
                   place={place}
-                  listClickHandler={this.props.listClickHandler}
+                  handlePlaceSelect={this.props.handlePlaceSelect}
                   classes={classes}
                 />
               );
