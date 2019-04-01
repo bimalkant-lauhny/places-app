@@ -21,10 +21,18 @@ class SearchNearby extends React.Component {
 
   render() {
     return (
-      <div id="search-bar">
+      <div id="search-nearby" className='d-flex justify-content-center'>
         <form onSubmit={this.handleSubmit}>
-          <input type="text" value={this.state.query} onChange={this.handleChange} />
-          <button className="btn btn-primary" type="submit" onSubmit={this.handleSubmit}><i className="fa fa-search"></i></button>
+          <div id="search-nearby-form-group" className='d-flex align-items-center justify-content-center'>
+            <input type="text" placeholder="Enter Search Criteria"
+              value={this.state.query}
+              onChange={this.handleChange}
+            />
+            <button className="btn btn-primary" type="submit"
+              onSubmit={this.handleSubmit}>
+              <i className="fa fa-search"></i>
+            </button>
+          </div>
         </form>
       </div>
     );

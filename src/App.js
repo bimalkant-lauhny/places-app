@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import Autocomplete from 'react-google-autocomplete';
+import SearchLocation from './SearchLocation';
 import SearchNearby from './SearchNearby';
 import Map from './Map';
 import PlacesList from './PlacesList';
@@ -11,21 +11,32 @@ class App extends Component {
     super(props);
     this.state = {
       location: {},
+      address: '',
       map: null,
-      google: null,
+      google: window.google,
       places: [],
       selectedPlace: null
     };
     this.handleFoundLocation = this.handleFoundLocation.bind(this);
     this.zoomLocation = this.zoomLocation.bind(this);
+    this.resetMapLocation = this.resetMapLocation.bind(this);
     this.getPlacesFromAPI = this.getPlacesFromAPI.bind(this);
     this.handlePlaceSelect = this.handlePlaceSelect.bind(this);
   }
 
   zoomLocation(marker) {
     let map = this.state.map;
-    map.setZoom(30);
+    map.setZoom(20);
     map.setCenter(marker.getPosition());
+  }
+
+  resetMapLocation(place) {
+    this.setState({
+      address: place.address,
+      location: place.location
+    });
+    console.log("Reset Location: ", this.state);
+    this.handleFoundLocation();
   }
 
   getPlacesFromAPI(query) {
@@ -78,28 +89,27 @@ class App extends Component {
     this.setState({
       map: new google.maps.Map(mapDiv, {
         center: currentLocation,
-        zoom: 15
+        zoom: 10
       })
     });
   }
-  
 
   componentWillMount() {
     // set current user location in state
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
+        console.log("position: ", position)
         this.setState({
           location: {
             lat: position.coords.latitude,
             long: position.coords.longitude
-          },
-          google: window.google
+          }
         });
         this.handleFoundLocation();
       });
     } else {
       // alert if geolocation is not supported
-      alert('Geolocation is not supported by this browser! App will not work correctly.');
+      alert('Geolocation is not supported by this browser! Manually enter your location.');
     }
   }
 
@@ -107,17 +117,13 @@ class App extends Component {
     return (
       <div className='App'>
         <div className='row'>
-          <div className='col'>
-            <Autocomplete
-              style={{ width: '90%' }}
-              onPlaceSelected={(place) => {
-                console.log("Location: ", place);
-              }}
-              types={['(regions)']}
+          <div className='col-md-6'>
+            <SearchLocation
+              resetMapLocation={this.resetMapLocation}
             />
           </div>
 
-          <div className='col'>
+          <div className='col-md-6'>
             <SearchNearby
               location={this.state.location}
               map={this.state.map}
@@ -127,10 +133,10 @@ class App extends Component {
           </div>
         </div>
         <div className='row'>
-          <div className='col'>
+          <div className='col-md-6'>
             <Map />
           </div>
-          <div className='col'>
+          <div className='col-md-6'>
             <PlacesList
               places={this.state.places}
               handlePlaceSelect={this.handlePlaceSelect}

@@ -6,7 +6,7 @@ class ListItem extends React.Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  handleClick(event) {
+  handleClick() {
     this.props.handlePlaceSelect(this.props.place);
   }
 
