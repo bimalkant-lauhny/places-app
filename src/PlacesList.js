@@ -1,53 +1,52 @@
 import React from 'react';
 
 class ListItem extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            active: false
-        }
-        this.handleClick = this.handleClick.bind(this);
-    }
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
 
-    handleClick(e) {
-        this.setState({
-            active: true
-        });
-    }
+  handleClick(e) {
+    this.props.listClickHandler(this.props.place);
+  }
 
-    render() {
-        let classes = "list-group-item";
-        if (this.state.active)
-            classes += " active";
-        return (
-            <li className={classes} onClick={this.handleClick}>
-                <p>{this.props.place.name}</p>
-                <p>{this.props.place.formatted_address}</p>
-            </li>
-        );
-    }
+  render() {
+    return (
+      <li className={this.props.classes} onClick={this.handleClick}>
+        <p>{this.props.place.name}</p>
+        <p>{this.props.place.formatted_address}</p>
+      </li>
+    );
+  }
 }
 
 class PlacesList extends React.Component {
-    render() {
-        const places = this.props.places;
-        console.log("Places: ", places); 
-        return (
-            <div className="row" id='places-list'>
-                <ul className="list-group">
-                    {
-                        places.map((place, index) => {
-                            return (
-                                <ListItem key={index.toString()}
-                                    place={place}
-                                />
-                            );
-                        })
-                    }
-                </ul>
-            </div>
-        );
-    }
+  render() {
+    const places = this.props.places;
+    console.log("Places: ", places);
+    return (
+      <div className="row" id='places-list'>
+        <ul className="list-group">
+          {
+            places.map((place, index) => {
+              let classes = "list-group-item";
+              if (this.props.selectedPlace === place) {
+                classes += " active";
+              }
+              return (
+                <ListItem
+                  key={index.toString()}
+                  place={place}
+                  listClickHandler={this.props.listClickHandler}
+                  classes={classes}
+                />
+              );
+            })
+          }
+        </ul>
+      </div>
+    );
+  }
 }
 
 export default PlacesList;

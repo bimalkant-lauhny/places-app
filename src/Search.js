@@ -1,13 +1,6 @@
 import React from 'react';
+import Map from './Map';
 import PlacesList from './PlacesList';
-
-class Map extends React.Component {
-  render() {
-    return (
-      <div id='map'></div>
-    );
-  }
-}
 
 class Search extends React.Component {
   constructor(props) {
@@ -15,9 +8,17 @@ class Search extends React.Component {
     this.state = {
       query: '',
       places: [],
+      selectedPlace: ''
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.listClickHandler = this.listClickHandler.bind(this);
+  }
+
+  zoomLocation = (marker) => {
+    let map = this.props.map;
+    map.setZoom(30);
+    map.setCenter(marker.getPosition());
   }
 
   handleChange(event) {
@@ -49,8 +50,7 @@ class Search extends React.Component {
           });
           // click on marker to zoom
           marker.addListener('click', () => {
-            map.setZoom(30);
-            map.setCenter(marker.getPosition());
+            this.zoomLocation(marker);
           });
           // add marker to result (passing to PlacesList)
           results[i].marker = marker;
@@ -63,6 +63,13 @@ class Search extends React.Component {
     }
 
     service.textSearch(request, callback);
+  }
+
+  listClickHandler(selectedPlace) {
+    this.setState({
+      selectedPlace: selectedPlace
+    });
+    this.zoomLocation(selectedPlace.marker);
   }
 
   render() {
@@ -79,10 +86,15 @@ class Search extends React.Component {
             <Map
               location={this.props.location}
               map={this.props.map}
+              selectedPlace={this.state.selectedPlace}
             />
           </div>
           <div className="col">
-            <PlacesList places={this.state.places} />
+            <PlacesList
+              places={this.state.places}
+              listClickHandler={this.listClickHandler}
+              selectedPlace={this.state.selectedPlace}
+            />
           </div>
         </div>
       </div>

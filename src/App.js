@@ -35,13 +35,13 @@ class App extends Component {
       });
     } else {
       // alert if geolocation is not supported
-      alert("Geolocation is not supported by this browser! App will not work correctly.");
+      alert('Geolocation is not supported by this browser! App will not work correctly.');
     }
   }
 
   render() {
     return (
-      <div className="App">
+      <div className='App'>
         <Search
           location={this.state.location}
           map={this.state.map}
