@@ -1,33 +1,53 @@
 import React from 'react';
 
-function ListItem(props) {
-    return (
-        <li className="list-group-item">
-            <p>{props.name}</p>
-            <p>{props.address}</p>
-        </li>
-    );
+class ListItem extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            active: false
+        }
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick(e) {
+        this.setState({
+            active: true
+        });
+    }
+
+    render() {
+        let classes = "list-group-item";
+        if (this.state.active)
+            classes += " active";
+        return (
+            <li className={classes} onClick={this.handleClick}>
+                <p>{this.props.place.name}</p>
+                <p>{this.props.place.formatted_address}</p>
+            </li>
+        );
+    }
 }
 
-function PlacesList(props) {
-    const places = props.places;
-    console.log("Places: ", places);
-    return (
-        <div className="row" id='places-list'>
-            <ul className="list-group">
-                {
-                    places.map((place, index) => {
-                        return (
-                            <ListItem key={index.toString()}
-                                name={place.name}
-                                address={place.formatted_address}
-                            />
-                        );
-                    })
-                }
-            </ul>
-        </div>
-    );
+class PlacesList extends React.Component {
+    render() {
+        const places = this.props.places;
+        console.log("Places: ", places); 
+        return (
+            <div className="row" id='places-list'>
+                <ul className="list-group">
+                    {
+                        places.map((place, index) => {
+                            return (
+                                <ListItem key={index.toString()}
+                                    place={place}
+                                />
+                            );
+                        })
+                    }
+                </ul>
+            </div>
+        );
+    }
 }
 
 export default PlacesList;
