@@ -3,11 +3,14 @@ Places Nearby
 
 Web App for searching places nearby you.
 
+
 ### Requirements for running
+
 This webapp has been tested in an environment with the following -
 1. node v10.15.3
 2. npm 6.4.1
 3. OS - Ubuntu 18.10
+
 
 ### Instructions to run
 
@@ -56,6 +59,28 @@ You should see following output (or similar) on your terminal.
 ```
 
 5. Open address `http://localhost:5000` in your browser.
+
+
+### Using Webapp
+
+1. After you open link `http://localhost:5000` in your browser, you'll be asked for location permission as shown in screenshot below.
+
+    ![Location Permission](location-permission.png)
+    
+It is recommended that you allow app to access your location.
+
+2. Below is a screenshot of webapp.
+    
+    ![Screenshot](screenshot.png)
+
+* Input Box on upper left side is for putting custom location (in case if you did not allow application to fetch your location)!
+
+* Input Box on upper right side is for Nearby Places queries. For example, if you type `pizza` and press `Search` button (or `Enter` key), it will fetch nearby locations where you can get a pizza.
+
+* Map is visible on the lower left side of screen. It will show markers at locations on Nearby Places (after you submit a search query).
+
+* List of Nearby Places is visible in form of scrollable cards on lower right side on screen (after you submit a search query). Each card has `Place Name` and `Place Address`. You can click on any card to zoom it's location on Map.
+
 
 ### Development
 
