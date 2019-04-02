@@ -67,13 +67,14 @@ You should see following output (or similar) on your terminal.
 
     ![Location Permission](location-permission.png)
     
-It is recommended that you allow app to access your location.
+It is recommended that you allow app to access your location. (Custom Location Feature is under development! could not test it due to API restrictions. Sorry!)
 
 2. Below is a screenshot of webapp.
     
     ![Screenshot](screenshot.png)
 
 * Input Box on upper left side is for putting custom location (in case if you did not allow application to fetch your location)!
+  (Custom Location Feature is under development! could not test it due to API restrictions. Sorry!)
 
 * Input Box on upper right side is for Nearby Places queries. For example, if you type `pizza` and press `Search` button (or `Enter` key), it will fetch nearby locations where you can get a pizza.
 
