@@ -5,21 +5,27 @@ class SearchLocation extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
-      address: '', 
-      location: {}
+      address: 'Greenwich, London, UK', 
+      location: {
+        lat: 51.482578,
+        long: -0.007659
+      }
     };
   }
  
   handleChange = address => {
-    this.setState({ address });
+    this.setState({ address: address });
   };
  
   handleSelect = address => {
+    this.setState({ address: address });
     geocodeByAddress(address)
       .then(results => getLatLng(results[0]))
       .then(latLng => {
-        this.setState({location: latLng});
-        this.props.resetMapLocation(this.state);
+        this.setState({
+          location: latLng
+        });
+        this.props.updateLocationAddress(this.state);
       })
       .catch(error => console.error('Error', error));
   };
@@ -32,7 +38,7 @@ class SearchLocation extends React.Component {
         onSelect={this.handleSelect}
       >
         {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-          <div id='search-location' className='d-flex justify-content-center'>
+          <div id='search-location'>
             <div id="search-location-form-group" className='d-flex align-items-center justify-content-center'>
               <input
                 {...getInputProps({
