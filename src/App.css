@@ -30,6 +30,7 @@ input[type=text] {
   margin: 8px;
   font-size: 17px;
   border: none;
+  width: 100%;
 }
 
 button {
@@ -63,8 +64,12 @@ button {
   padding: 10px
 }
 
-#search-nearby-form-group, #search-location-form-group {
+#search-nearby-form-group {
   width: 325px;
+}
+
+#search-location-form-group {
+  width: 100%;
 }
 
 #map, #places-list {

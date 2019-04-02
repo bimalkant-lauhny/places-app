@@ -5,10 +5,13 @@ class Map extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      focusLocation: null
+      location: {
+        lat: 51.482578,
+        long: -0.007659
+      }
     }
   }
-
+  
   render() {
     return (
       <div id='map'></div>

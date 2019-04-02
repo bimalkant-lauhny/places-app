@@ -8,6 +8,7 @@ class SearchNearby extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.getPlacesFromAPI = this.getPlacesFromAPI.bind(this);
   }
 
   handleChange(event) {
@@ -16,7 +17,39 @@ class SearchNearby extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    this.props.getPlacesFromAPI(this.state.query);
+    this.getPlacesFromAPI(this.state.query);
+  }
+
+  getPlacesFromAPI(query) {
+    let { google, map, location } = this.props; 
+    let currentLocation = new google.maps.LatLng(location.lat, location.long);
+    let request = {
+      location: currentLocation,
+      radius: '500',
+      query: query
+    };
+
+    let service = new google.maps.places.PlacesService(map);
+
+    let callback = (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        for (let i = 0; i < results.length; i++) {
+          // create a marker for each place in result
+          results[i].marker = new google.maps.Marker({
+            map: map,
+            position: results[i].geometry.location
+          });
+          // click on marker to zoom
+          results[i].marker.addListener('click', () => {
+            this.props.zoomLocation(results[i].marker);
+          });
+        }
+      }
+
+      this.props.updatePlaces(results);
+    };
+
+    service.textSearch(request, callback);
   }
 
   render() {

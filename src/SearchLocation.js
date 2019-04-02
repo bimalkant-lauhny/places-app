@@ -5,14 +5,89 @@ class SearchLocation extends React.Component {
   constructor(props) {
     super(props);
     this.state = { 
+      address: '', 
+      location: {} 
+    };
+    this.getCurrentLocation();
+  }
+  
+  setFallbackAddress = () => {
+    this.setState({
       address: 'Greenwich, London, UK', 
       location: {
         lat: 51.482578,
         long: -0.007659
-      }
-    };
+      },
+    });
+    this.props.updateLocationAddress(this.state);
   }
- 
+
+  findLatLang = (latLng, geocoder) => {
+    return new Promise(function (resolve, reject) {
+      geocoder.geocode({ 'latLng': latLng }, function (results, status) {
+        console.log("Printing Result anyways: ", results);
+        if (status === window.google.maps.GeocoderStatus.OK) {
+          console.log(results);
+          resolve(results[0].formatted_address);
+        } else {
+          alert("Geocode API Error: " + status);
+          reject(new Error('Couldnt\'t find address'));
+        }
+      })
+    });
+  } 
+
+  getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      let successCallback = (position) => {
+        console.log("position: ", position);
+        let location = {
+          lat: position.coords.latitude,
+          long: position.coords.longitude
+        },
+          address = 'UNKNOWN ADDRESS!';
+
+        let { google } = this.props;
+        let geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(location.lat, location.lng);
+        this.findLatLang(latlng, geocoder)
+          .then(result => {
+            address = result;
+            this.props.updateLocationAddress({
+              location: location,
+              address: address
+            })
+            console.log("Found Address: ", this.state);
+          })
+          .catch(error => {
+            this.props.updateLocationAddress({
+              location: location,
+              address: address
+            })
+            console.error(error, this.state);
+          });
+      };
+
+      let errorCallback = (err) => {
+        console.log("Geolocation Navigator Error", err);
+        if (err.code === 1) {
+          alert("Geolocation Permission Denied! Choose your location manually.")
+        }
+        this.setFallbackAddress();
+      }
+
+      let options = {
+        enableHighAccuracy: true
+      };
+
+      navigator.geolocation.getCurrentPosition(successCallback, errorCallback, options);
+    } else {
+      // alert if geolocation is not supported
+      alert('Geolocation is not supported by this browser! Manually enter your location.');
+      this.setFallbackAddress();
+    }
+  }
+
   handleChange = address => {
     this.setState({ address: address });
   };
@@ -27,7 +102,11 @@ class SearchLocation extends React.Component {
         });
         this.props.updateLocationAddress(this.state);
       })
-      .catch(error => console.error('Error', error));
+      .catch(error => {
+        console.error("Geocode Error: ", error);
+        alert('Geocode API Error! Request Quota Exceeded. Add your own API key to index.html to use this app.');
+        this.props.updateLocationAddress(this.state);
+      });
   };
  
   render() {

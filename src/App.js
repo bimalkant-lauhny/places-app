@@ -10,17 +10,20 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      location: {},
-      address: '',
-      map: null,
+      address: 'Greenwich, London, UK', 
+      location: {
+        lat: 51.482578,
+        long: -0.007659
+      },
       google: window.google,
+      map: null,
       places: [],
       selectedPlace: null
     };
     this.handleFoundLocation = this.handleFoundLocation.bind(this);
     this.zoomLocation = this.zoomLocation.bind(this);
-    this.resetMapLocation = this.resetMapLocation.bind(this);
-    this.getPlacesFromAPI = this.getPlacesFromAPI.bind(this);
+    this.updateLocationAddress = this.updateLocationAddress.bind(this);
+    this.updatePlaces = this.updatePlaces.bind(this);
     this.handlePlaceSelect = this.handlePlaceSelect.bind(this);
   }
 
@@ -30,51 +33,22 @@ class App extends Component {
     map.setCenter(marker.getPosition());
   }
 
-  resetMapLocation(place) {
+  updatePlaces(places) {
+    this.setState({
+      places: places,
+      selectedPlace: null
+    });
+  }
+
+  updateLocationAddress(place) {
     this.setState({
       address: place.address,
       location: place.location
     });
     console.log("Reset Location: ", this.state);
-    this.handleFoundLocation();
+    this.handleFoundLocation(document.getElementById('map'));
   }
-
-  getPlacesFromAPI(query) {
-    let google = this.state.google,
-        map = this.state.map,
-        location = this.state.location;
-    let currentLocation = new google.maps.LatLng(location.lat, location.long);
-    let request = {
-      location: currentLocation,
-      radius: '500',
-      query: query
-    };
-
-    let service = new google.maps.places.PlacesService(map);
-
-    let callback = (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK) {
-        for (let i = 0; i < results.length; i++) {
-          // create a marker for each place in result
-          results[i].marker = new google.maps.Marker({
-            map: map,
-            position: results[i].geometry.location
-          });
-          // click on marker to zoom
-          results[i].marker.addListener('click', () => {
-            this.zoomLocation(results[i].marker);
-          });
-        }
-      }
-
-      this.setState({
-        places: results
-      });
-    };
-
-    service.textSearch(request, callback);
-  }
-
+  
   handlePlaceSelect(selectedPlace) {
     this.setState({
       selectedPlace: selectedPlace
@@ -82,35 +56,72 @@ class App extends Component {
     this.zoomLocation(selectedPlace.marker);
   }
 
-  handleFoundLocation() {
-    let google = this.state.google;
-    let currentLocation = new google.maps.LatLng(this.state.location.lat, this.state.location.long);
-    let mapDiv = document.getElementById('map');
-    this.setState({
-      map: new google.maps.Map(mapDiv, {
-        center: currentLocation,
-        zoom: 10
-      })
-    });
+  handleFoundLocation(mapElement) {
+    let { google, map, location } = this.state;
+    let currentLocation = new google.maps.LatLng(location.lat, location.long);
+    if (!map) {
+      this.setState({
+        map: new google.maps.Map(mapElement, {
+          center: currentLocation,
+          zoom: 10
+        })
+      });
+    } else {
+      map.setCenter(currentLocation);
+      map.setZoom(10);
+    }
+    console.log(this.state);
   }
 
+  findLatLang = (latLng, geocoder) => {
+    return new Promise(function (resolve, reject) {
+      geocoder.geocode({ 'latLng': latLng }, function (results, status) {
+        console.log("Printing Result anyways: ", results);
+        if (status === window.google.maps.GeocoderStatus.OK) {
+          console.log(results);
+          resolve(results[0].formatted_address);
+        } else {
+          alert("Geocode API Error: " + status);
+          reject(new Error('Couldnt\'t find address'));
+        }
+      })
+    });
+  } 
+
   componentWillMount() {
-    // set current user location in state
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
-        console.log("position: ", position)
-        this.setState({
-          location: {
-            lat: position.coords.latitude,
-            long: position.coords.longitude
-          }
-        });
-        this.handleFoundLocation();
+        console.log("position: ", position);
+        let location = {
+          lat: position.coords.latitude,
+          long: position.coords.longitude
+        },
+          address = 'UNKNOWN ADDRESS!';
+
+        let { google } = this.state;
+        let geocoder = new google.maps.Geocoder();
+        var latlng = new google.maps.LatLng(location.lat, location.lng);
+        this.findLatLang(latlng, geocoder)
+          .then(result => {
+            address = result;
+            this.updateLocationAddress({
+              location: location,
+              address: address
+            })
+            console.log("Found Address: ", this.state);
+          })
+          .catch(error => {
+            this.updateLocationAddress({
+              location: location,
+              address: address
+            })
+            console.error(error, this.state);
+          });
       });
     } else {
       // alert if geolocation is not supported
       alert('Geolocation is not supported by this browser! Manually enter your location.');
-    }
+    }    
   }
 
   render() {
@@ -119,7 +130,11 @@ class App extends Component {
         <div className='row'>
           <div className='col-md-6'>
             <SearchLocation
-              resetMapLocation={this.resetMapLocation}
+              map={this.state.map}
+              google={this.state.google}
+              location={this.state.location}
+              address={this.state.address}
+              updateLocationAddress={this.updateLocationAddress}
             />
           </div>
 
@@ -128,13 +143,17 @@ class App extends Component {
               location={this.state.location}
               map={this.state.map}
               google={this.state.google}
-              getPlacesFromAPI={this.getPlacesFromAPI}
+              updatePlaces={this.updatePlaces}
+              zoomLocation={this.zoomLocation}
             />
           </div>
         </div>
         <div className='row'>
           <div className='col-md-6'>
-            <Map />
+            <Map
+              map={this.state.map}
+              google={this.state.google}
+            />
           </div>
           <div className='col-md-6'>
             <PlacesList
