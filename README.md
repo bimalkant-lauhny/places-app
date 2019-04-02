@@ -55,6 +55,8 @@ You should see following output (or similar) on your terminal.
     Copied local address to clipboard!
 ```
 
+5. Open address `http://localhost:5000` in your browser.
+
 ### Development
 
 This webapp has been developed using `create-react-app` package and `Visual Studio Code`.
