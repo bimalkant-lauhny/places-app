@@ -44,6 +44,8 @@ class SearchNearby extends React.Component {
             this.props.zoomLocation(results[i].marker);
           });
         }
+      } else {
+        alert('Google Places API Error: ' + status);
       }
 
       this.props.updatePlaces(results);

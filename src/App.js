@@ -28,7 +28,7 @@ class App extends Component {
   }
 
   zoomLocation(marker) {
-    let map = this.state.map;
+    let { map } = this.state;
     map.setZoom(20);
     map.setCenter(marker.getPosition());
   }
@@ -54,6 +54,7 @@ class App extends Component {
       selectedPlace: selectedPlace
     });
     this.zoomLocation(selectedPlace.marker);
+    console.log("After clicking on list item: ", this.state);
   }
 
   handleFoundLocation(mapElement) {
@@ -71,57 +72,6 @@ class App extends Component {
       map.setZoom(10);
     }
     console.log(this.state);
-  }
-
-  findLatLang = (latLng, geocoder) => {
-    return new Promise(function (resolve, reject) {
-      geocoder.geocode({ 'latLng': latLng }, function (results, status) {
-        console.log("Printing Result anyways: ", results);
-        if (status === window.google.maps.GeocoderStatus.OK) {
-          console.log(results);
-          resolve(results[0].formatted_address);
-        } else {
-          alert("Geocode API Error: " + status);
-          reject(new Error('Couldnt\'t find address'));
-        }
-      })
-    });
-  } 
-
-  componentWillMount() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        console.log("position: ", position);
-        let location = {
-          lat: position.coords.latitude,
-          long: position.coords.longitude
-        },
-          address = 'UNKNOWN ADDRESS!';
-
-        let { google } = this.state;
-        let geocoder = new google.maps.Geocoder();
-        var latlng = new google.maps.LatLng(location.lat, location.lng);
-        this.findLatLang(latlng, geocoder)
-          .then(result => {
-            address = result;
-            this.updateLocationAddress({
-              location: location,
-              address: address
-            })
-            console.log("Found Address: ", this.state);
-          })
-          .catch(error => {
-            this.updateLocationAddress({
-              location: location,
-              address: address
-            })
-            console.error(error, this.state);
-          });
-      });
-    } else {
-      // alert if geolocation is not supported
-      alert('Geolocation is not supported by this browser! Manually enter your location.');
-    }    
   }
 
   render() {

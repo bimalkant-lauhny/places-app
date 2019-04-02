@@ -125,9 +125,6 @@ class SearchLocation extends React.Component {
                   className: 'location-search-input',
                 })}
               />
-              <button className="btn btn-danger" type="submit">
-                <i className="fa fa-times"></i>
-              </button>
             </div>
             <div className="autocomplete-dropdown-container">
               {loading && <div>Loading...</div>}
